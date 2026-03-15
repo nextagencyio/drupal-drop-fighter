@@ -16,15 +16,15 @@ const KEY_MAP = {
     KeyX:       'punch',
     KeyZ:       'kick',
     KeyC:       'special1',
-    KeyB:       'special3',
+    KeyV:       'special3',
     x:          'punch',
     X:          'punch',
     z:          'kick',
     Z:          'kick',
     c:          'special1',
     C:          'special1',
-    b:          'special3',
-    B:          'special3',
+    v:          'special3',
+    V:          'special3',
 
 };
 
