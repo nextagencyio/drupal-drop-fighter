@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Drupal Drop Fighter</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100%; height: 100%;
+            background: #000;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ── Game container: always fills viewport, keeps 16:9 ── */
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 56.25vw;  /* 16:9 */
+            max-height: 100vh;
+            max-width: 177.78vh;
+        }
+
+        canvas#game-canvas {
+            width: 100%; height: 100%;
+            display: block;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+
+        /* ── HUD overlay ── */
+        #hud {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+        }
+
+        /* SF2-style health bar area */
+        .hud-top {
+            position: absolute; top: 0; left: 0; right: 0;
+            height: 72px;
+            display: flex;
+            align-items: flex-start;
+            padding: 10px 2% 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%);
+        }
+
+        /* Player 1 side */
+        .hud-p1 {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        /* Player 2 side */
+        .hud-p2 {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        /* Health bars — SF2 style, thick with beveled look */
+        .health-bar-wrap {
+            width: 100%;
+            height: 26px;
+            background: #1a0000;
+            border: 2px solid #554422;
+            border-radius: 3px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .health-bar {
+            height: 100%;
+            width: 100%;
+            transition: width 0.15s ease-out;
+            position: relative;
+        }
+        #p1-health {
+            background: linear-gradient(180deg, #ffee44 0%, #ddaa00 30%, #cc8800 60%, #aa6600 100%);
+            border-right: 2px solid #ffee66;
+        }
+        #p2-health {
+            background: linear-gradient(180deg, #ffee44 0%, #ddaa00 30%, #cc8800 60%, #aa6600 100%);
+            float: right;
+            border-left: 2px solid #ffee66;
+        }
+        /* Health bar inner shine */
+        .health-bar::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 40%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 100%);
+            pointer-events: none;
+        }
+
+        /* Fighter names */
+        .fighter-name {
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #fff;
+            text-shadow: 1px 1px 0 #000, 2px 2px 0 rgba(0,0,0,0.5);
+            margin-top: 4px;
+        }
+
+        /* KO emblem center */
+        .hud-center {
+            width: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-shrink: 0;
+            padding-top: 0;
+        }
+
+        /* Timer */
+        #timer {
+            font-size: 36px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 2px 2px 0 #000, 0 0 10px rgba(255,200,0,0.3);
+            text-align: center;
+            line-height: 1;
+            min-width: 50px;
+        }
+        #timer.urgent {
+            color: #ff3333;
+            animation: timer-pulse 0.5s ease-in-out infinite;
+        }
+        @keyframes timer-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        /* KO text */
+        .ko-emblem {
+            font-size: 11px;
+            font-weight: bold;
+            color: #ffcc00;
+            text-shadow: 1px 1px 0 #000;
+            margin-top: 2px;
+            letter-spacing: 3px;
+            background: linear-gradient(180deg, #cc2200, #881100);
+            padding: 1px 8px;
+            border-radius: 2px;
+            border: 1px solid #ff4400;
+        }
+
+        /* Round dots — below health bars */
+        .round-dots {
+            display: flex;
+            gap: 6px;
+            margin-top: 2px;
+        }
+        .dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: #222;
+            border: 1px solid #555;
+            transition: all 0.3s;
+        }
+        .dot.won {
+            background: #ffcc00;
+            border-color: #ffaa00;
+            box-shadow: 0 0 8px #ffcc0088;
+        }
+
+        /* Hero trash talk (left side) */
+        #player-trash-talk {
+            position: absolute;
+            top: 18%; left: 4%;
+            max-width: 280px;
+            font-size: 22px; font-weight: bold;
+            font-style: italic;
+            color: #5BC0F8;
+            text-shadow: 1px 1px 0 #000, 0 0 12px rgba(91,192,248,0.4);
+            text-transform: none;
+            letter-spacing: 0.3px;
+            line-height: 1.35;
+            opacity: 0;
+            transition: opacity 0.4s ease-in;
+            pointer-events: none;
+        }
+        #player-trash-talk.visible {
+            opacity: 1;
+            animation: trash-fade 0.5s ease-out;
+        }
+
+        /* Enemy trash talk (right side) */
+        #move-announcement {
+            position: absolute;
+            top: 18%; right: 4%;
+            max-width: 280px;
+            font-size: 22px; font-weight: bold;
+            font-style: italic;
+            color: #ff8866;
+            text-shadow: 1px 1px 0 #000;
+            text-transform: none;
+            letter-spacing: 0.3px;
+            line-height: 1.35;
+            opacity: 0;
+            transition: opacity 0.4s ease-in;
+            pointer-events: none;
+        }
+        #move-announcement.visible {
+            opacity: 1;
+            animation: trash-fade 0.5s ease-out;
+        }
+        @keyframes trash-fade {
+            0% { opacity: 0; transform: translateY(-4px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Controls bar at bottom */
+        #controls-bar {
+            position: absolute;
+            bottom: 6px; left: 0; right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            pointer-events: none;
+            flex-wrap: wrap;
+        }
+        .ctrl-group {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 6px;
+            padding: 4px 10px;
+        }
+        .ctrl-group kbd {
+            display: inline-block;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            min-width: 24px;
+            text-align: center;
+        }
+        .ctrl-group .ctrl-label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-family: 'Courier New', monospace;
+        }
+        .ctrl-group.special kbd {
+            background: rgba(6,120,190,0.3);
+            border-color: rgba(6,120,190,0.6);
+            color: #5BC0F8;
+        }
+
+        /* Center announcements */
+        #announcement {
+            position: absolute;
+            top: 45%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 56px; font-weight: bold;
+            color: #fff;
+            text-shadow: 4px 4px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.15s;
+            white-space: nowrap;
+            letter-spacing: 4px;
+        }
+        #announcement.visible { opacity: 1; }
+        #announcement .sub {
+            display: block;
+            font-size: 20px;
+            color: #ffcc00;
+            margin-top: 8px;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        /* Win screen */
+        #win-screen {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.88);
+            pointer-events: auto;
+            z-index: 10;
+        }
+        #win-screen.visible { display: flex; }
+        #win-screen h1 {
+            font-size: 52px;
+            color: #ffcc00;
+            text-shadow: 3px 3px 0 #000, 0 0 20px rgba(255,200,0,0.4);
+            margin-bottom: 12px;
+            letter-spacing: 6px;
+        }
+        #win-screen .quote {
+            font-size: 18px;
+            color: #aaa;
+            margin-bottom: 36px;
+            font-style: italic;
+        }
+        #win-screen .cta {
+            padding: 16px 42px;
+            font-size: 20px; font-weight: bold;
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(180deg, #0899e0, #0678BE);
+            color: #fff;
+            border: 2px solid #29A3E0;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.2s;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(6,120,190,0.4);
+        }
+        #win-screen .cta:hover { background: linear-gradient(180deg, #29A3E0, #0899e0); transform: scale(1.05); }
+        #win-screen .restart {
+            margin-top: 18px;
+            background: none;
+            border: 1px solid #555;
+            color: #888;
+            padding: 12px 32px;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        #win-screen .restart:hover { border-color: #aaa; color: #ccc; }
+
+        /* Intro screen */
+        #intro-screen {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(6,40,80,0.95) 50%, rgba(0,0,0,0.95) 100%);
+            pointer-events: auto;
+            z-index: 20;
+        }
+        #intro-screen.hidden { display: none; }
+        #intro-screen h1 {
+            font-size: 60px;
+            color: #0678BE;
+            text-shadow: 4px 4px 0 #000, 0 0 30px rgba(6,120,190,0.5);
+            letter-spacing: 6px;
+            margin-bottom: 8px;
+            text-align: center;
+            line-height: 1.1;
+        }
+        #intro-screen .subtitle {
+            font-size: 18px;
+            color: #ffcc00;
+            margin-bottom: 50px;
+            letter-spacing: 4px;
+            text-shadow: 2px 2px 0 #000;
+        }
+        #intro-screen .start-btn {
+            padding: 18px 56px;
+            font-size: 24px; font-weight: bold;
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(180deg, #cc2200, #991100);
+            color: #fff;
+            border: 3px solid #ff4400;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            animation: start-pulse 1.2s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(255,68,0,0.4);
+            text-shadow: 2px 2px 0 #000;
+        }
+        #intro-screen .start-btn:hover { background: linear-gradient(180deg, #ee3300, #cc2200); }
+        @keyframes start-pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(255,68,0,0.4); }
+            50% { box-shadow: 0 0 40px rgba(255,68,0,0.7); }
+        }
+        #intro-screen .controls-hint {
+            margin-top: 40px;
+            font-size: 13px;
+            color: #556;
+            text-align: center;
+            line-height: 2;
+        }
+        #intro-screen .controls-hint kbd {
+            background: #1a1a2e;
+            border: 1px solid #444;
+            padding: 3px 8px;
+            border-radius: 3px;
+            color: #aaa;
+            font-size: 12px;
+        }
+
+        /* Mobile touch controls */
+        #touch-controls {
+            display: none;
+            position: absolute; bottom: 0; left: 0; right: 0;
+            height: 140px;
+            pointer-events: auto;
+        }
+        @media (pointer: coarse) {
+            #touch-controls { display: flex; justify-content: space-between; padding: 10px 16px; }
+        }
+        .dpad {
+            width: 120px; height: 120px;
+            position: relative;
+        }
+        .dpad button {
+            position: absolute;
+            width: 40px; height: 40px;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 4px;
+            color: #fff; font-size: 18px;
+            touch-action: manipulation;
+        }
+        .dpad .up    { top: 0;   left: 40px; }
+        .dpad .down  { bottom: 0; left: 40px; }
+        .dpad .left  { top: 40px; left: 0; }
+        .dpad .right { top: 40px; right: 0; }
+        .action-buttons {
+            display: flex; gap: 12px; align-items: center;
+        }
+        .action-buttons button {
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            font-size: 16px; font-weight: bold;
+            font-family: 'Courier New', monospace;
+            touch-action: manipulation;
+            border: 2px solid;
+        }
+        .btn-punch { background: rgba(6,120,190,0.5); border-color: #0678BE; color: #fff; }
+        .btn-kick  { background: rgba(204,34,0,0.5); border-color: #CC2200; color: #fff; }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas" width="1024" height="576"></canvas>
+
+        <!-- HUD Overlay — SF2 Style -->
+        <div id="hud">
+            <div class="hud-top">
+                <!-- P1 Side -->
+                <div class="hud-p1">
+                    <div id="p1-health-wrap" class="health-bar-wrap"><div id="p1-health" class="health-bar"></div></div>
+                    <div class="hud-p1-info">
+                        <div id="p1-name" class="fighter-name">DRUPAL DROP</div>
+                        <div id="p1-dots" class="round-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+                    </div>
+                </div>
+                <!-- Center KO / Timer -->
+                <div class="hud-center">
+                    <div id="timer">60</div>
+                    <div class="ko-emblem">KO</div>
+                </div>
+                <!-- P2 Side -->
+                <div class="hud-p2">
+                    <div id="p2-health-wrap" class="health-bar-wrap"><div id="p2-health" class="health-bar"></div></div>
+                    <div class="hud-p2-info">
+                        <div id="p2-name" class="fighter-name">THE MONOLITH</div>
+                        <div id="p2-dots" class="round-dots" style="justify-content: flex-end;"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+                    </div>
+                </div>
+            </div>
+            <div id="announcement"></div>
+            <div id="player-trash-talk"></div>
+            <div id="move-announcement"></div>
+            <div id="controls-bar">
+                <div class="ctrl-group"><kbd>←</kbd><kbd>→</kbd><span class="ctrl-label">Move</span></div>
+                <div class="ctrl-group"><kbd>↑</kbd><span class="ctrl-label">Jump</span></div>
+                <div class="ctrl-group"><kbd>↓</kbd><span class="ctrl-label">Crouch</span></div>
+                <div class="ctrl-group"><kbd>X</kbd><span class="ctrl-label">Punch</span></div>
+                <div class="ctrl-group"><kbd>Z</kbd><span class="ctrl-label">Kick</span></div>
+                <div class="ctrl-group special"><kbd>C</kbd><span class="ctrl-label">Head Throw</span></div>
+                <div class="ctrl-group special"><kbd>V</kbd><span class="ctrl-label">Shoryuken</span></div>
+
+                <div class="ctrl-group"><kbd>←</kbd><span class="ctrl-label">Block</span></div>
+            </div>
+        </div>
+
+        <!-- Win Screen -->
+        <div id="win-screen">
+            <h1 id="win-title">YOU WIN</h1>
+            <div class="quote" id="win-quote">"Your monolith has been decoupled."</div>
+            <a class="cta" href="https://decoupled.io" target="_blank">Ready to go headless? →</a>
+            <button class="restart" id="restart-btn">FIGHT AGAIN</button>
+        </div>
+
+        <!-- Intro Screen (hidden — replaced by attract mode) -->
+        <div id="intro-screen" class="hidden">
+            <h1>DRUPAL DROP<br>FIGHTER</h1>
+            <div class="subtitle">VS THE MONOLITH</div>
+            <button class="start-btn" id="start-btn">PRESS START</button>
+            <div class="controls-hint">
+                <kbd>←</kbd> <kbd>→</kbd> Move &nbsp;
+                <kbd>↑</kbd> Jump &nbsp;
+                <kbd>↓</kbd> Crouch &nbsp;
+                Hold <kbd>←</kbd> Block<br>
+                <kbd>X</kbd> Punch &nbsp;
+                <kbd>Z</kbd> Kick &nbsp;
+                <kbd>C</kbd> Head Throw &nbsp;
+                <kbd>V</kbd> Shoryuken
+            </div>
+        </div>
+
+        <!-- Touch Controls -->
+        <div id="touch-controls">
+            <div class="dpad">
+                <button class="up" data-dir="up">↑</button>
+                <button class="down" data-dir="down">↓</button>
+                <button class="left" data-dir="left">←</button>
+                <button class="right" data-dir="right">→</button>
+            </div>
+            <div class="action-buttons">
+                <button class="btn-punch" data-action="punch">X</button>
+                <button class="btn-kick" data-action="kick">Z</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
