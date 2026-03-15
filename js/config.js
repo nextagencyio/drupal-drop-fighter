@@ -200,6 +200,7 @@ export const FIGHTER_STATE = {
     WAKEUP: 'wakeup',
     INTRO_WALK: 'intro_walk',
     WIN_POSE: 'win_pose',
+    CELEBRATE: 'celebrate',
 };
 
 // --- Move Types (for mapping inputs to actions) ---

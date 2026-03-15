@@ -475,7 +475,8 @@ export class Fighter {
     isInCinematic() {
         return (
             this.state === FIGHTER_STATE.INTRO_WALK ||
-            this.state === FIGHTER_STATE.WIN_POSE
+            this.state === FIGHTER_STATE.WIN_POSE ||
+            this.state === FIGHTER_STATE.CELEBRATE
         );
     }
 

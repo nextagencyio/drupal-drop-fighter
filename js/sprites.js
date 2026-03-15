@@ -189,6 +189,19 @@ export function drawDrupalDrop(ctx, x, y, facing, frame, options = {}) {
         case 'blocking': lean = 0.15; ox = -3; rArmAng = 0.3; lArmAng = 0.3; legSpr = 0.35; crouch = 0.1; break;
         case 'ko': { const p = Math.min(attackFrame / ANIM.KO_FRAMES, 1); lean = 0.3 + p * 1.3; oy = p * 40; ox = -p * 20; squash = 1 - p * 0.4; break; }
         case 'win_pose': oy = Math.sin(frame * 0.05) * 2; rArmAng = -1.5; rArmExt = 0.6; lean = -0.1; lArmAng = -1.2; break;
+        case 'celebrate': {
+            // Repeatedly jump up and down with arms raised
+            const t = frame * 0.18;
+            const bounce = Math.abs(Math.sin(t)) * 30;
+            oy = -bounce;
+            squash = bounce > 20 ? 1.15 : bounce < 4 ? 0.85 : 1;
+            legSpr = 0.3 + Math.abs(Math.sin(t)) * 0.4;
+            rArmAng = -1.4 - Math.abs(Math.sin(t)) * 0.4;
+            lArmAng = -1.2 - Math.abs(Math.sin(t)) * 0.4;
+            rArmExt = 0.5;
+            lean = Math.sin(t * 0.5) * 0.08;
+            break;
+        }
         case 'intro_walk': oy = Math.abs(walkSin) * 3; legSpr = 0.2 + walkSin * 0.3; break;
         case 'wakeup': { const p = Math.min(attackFrame / 15, 1); lean = 1.5 * (1 - p); oy = 40 * (1 - p); ox = -20 * (1 - p); break; }
     }

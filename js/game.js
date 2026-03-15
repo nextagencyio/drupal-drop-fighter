@@ -542,7 +542,8 @@ export class Game {
 
     matchOver(winner) {
         this._matchWinner = winner;
-        this.player.setState(FIGHTER_STATE.WIN_POSE);
+        this.player.setState(FIGHTER_STATE.CELEBRATE);
+        this.enemy.setState(FIGHTER_STATE.KO);
         this.changeState(GAME_STATE.MATCH_CELEBRATION);
     }
 

@@ -41,34 +41,35 @@ const game = new Game(hud, audio, input);
 // Attract Mode Setup
 // ---------------------------------------------------------
 
-// Bootstrap audio on first user interaction (browser autoplay policy)
-const _initAudio = () => {
-    audio.init();
-    audio.startMenuMusic();
-    window.removeEventListener('keydown', _initAudio);
-    window.removeEventListener('click',   _initAudio);
-    window.removeEventListener('touchstart', _initAudio);
-};
-window.addEventListener('keydown',   _initAudio);
-window.addEventListener('click',     _initAudio);
-window.addEventListener('touchstart', _initAudio);
-
 // Hide player controls until a real game begins
 const controlsBar = document.getElementById('controls-bar');
 controlsBar.style.display = 'none';
 
-// Enter (or tap) transitions from attract demo to real player game
+// Title screen — shown until first click/keydown, satisfies browser autoplay policy
+let titleActive = true;
+
+function startDemo() {
+    if (!titleActive) return;
+    titleActive = false;
+    audio.init();
+    audio.startMenuMusic();
+}
+
 function onInsertCoin() {
+    if (titleActive) {
+        startDemo();
+        return;
+    }
     if (!game.attractMode) return;
     game.startFromAttract();
     controlsBar.style.display = 'flex';
 }
 
 window.addEventListener('keydown', (e) => {
+    if (titleActive) { startDemo(); return; }
     if (e.key === 'Enter') onInsertCoin();
 });
 
-// Also allow a click/tap on the canvas to start
 document.getElementById('game-canvas').addEventListener('click', onInsertCoin);
 
 // ---------------------------------------------------------
@@ -138,6 +139,31 @@ function render() {
 
     // --- Scanlines ---
     drawScanlines(ctx, SCREEN.WIDTH, SCREEN.HEIGHT);
+
+    // --- Title screen ---
+    if (titleActive) {
+        ctx.save();
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, SCREEN.WIDTH, SCREEN.HEIGHT);
+
+        // Game title
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#f0a800';
+        ctx.font = 'bold 42px "Courier New", monospace';
+        ctx.fillText('DRUPAL DROP', SCREEN.WIDTH / 2, SCREEN.HEIGHT / 2 - 40);
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 28px "Courier New", monospace';
+        ctx.fillText('FIGHTER', SCREEN.WIDTH / 2, SCREEN.HEIGHT / 2 - 4);
+
+        // Blinking prompt
+        if (Math.floor(bgFrame / 30) % 2 === 0) {
+            ctx.fillStyle = 'rgba(255,255,255,0.85)';
+            ctx.font = '14px "Courier New", monospace';
+            ctx.fillText('CLICK OR PRESS ANY KEY TO START', SCREEN.WIDTH / 2, SCREEN.HEIGHT / 2 + 50);
+        }
+        ctx.restore();
+        return;
+    }
 
     // --- Attract mode hint ---
     if (game.attractMode) {
