@@ -141,63 +141,64 @@ export class Game {
 
         fighter._atDecTimer--;
         const dist = fighter.distanceTo(opponent);
+        const isHero = fighter === this.player;
 
-        // Execute current behaviour while timer is running
+        // Execute current action while timer is live
         if (fighter._atDecTimer > 0) {
             if (!fighter.canMove()) return;
             switch (fighter._atAction) {
                 case 'approach': fighter.walkForward(); break;
-                case 'retreat': fighter.startBlocking(); fighter.walkBack(); break;
-                case 'jump': fighter.jump(); break;
-                default: fighter.idle(); break;
+                case 'retreat':  fighter.startBlocking(); fighter.walkBack(); break;
+                default:         fighter.idle(); break;
             }
             return;
         }
 
-        // Make a new decision
+        // New decision — short timer keeps exchanges snappy
         fighter.stopBlocking();
+        fighter._atDecTimer = 6 + Math.floor(Math.random() * 8); // 6-13 frames
 
-        const isHero = fighter === this.player;
+        if (dist > 180) {
+            // Far away — both rush in; hero may throw head
+            if (isHero && !this.player.headDetached && Math.random() < 0.4 && fighter.canAttack()) {
+                fighter._startSpecialMove(MOVE.HEAD_THROW);
+                fighter._atDecTimer = 25; // wait for projectile to travel
+            }
+            fighter._atAction = 'approach';
 
-        if (isHero) {
-            // Hero zones with head throws — slower decision cadence
-            fighter._atDecTimer = 18 + Math.floor(Math.random() * 20);
-            const idealMin = 160, idealMax = 280;
-            if (dist < idealMin) {
-                fighter._atAction = 'retreat';
-            } else if (dist > idealMax) {
-                fighter._atAction = 'approach';
-            } else {
-                if (fighter.canAttack()) {
-                    fighter._startSpecialMove(MOVE.HEAD_THROW);
+        } else if (dist < 60) {
+            // Point-blank overlap — back off briefly then re-engage
+            fighter._atAction = 'retreat';
+            fighter._atDecTimer = 8 + Math.floor(Math.random() * 6);
+
+        } else {
+            // Brawl range (60-180px) — trade hits
+            if (fighter.canAttack()) {
+                if (isHero) {
+                    // Hero: faster move set, mix of jab/kick/uppercut/hook
+                    const r = Math.random();
+                    if (r < 0.28)      fighter.startAttack(MOVE.JAB);
+                    else if (r < 0.50) fighter.startAttack(MOVE.KICK);
+                    else if (r < 0.68) fighter.startAttack(MOVE.UPPERCUT);
+                    else               fighter.startAttack(MOVE.HOOK);
+                } else {
+                    // Enemy: jab/kick only
+                    if (Math.random() < 0.55) fighter.startAttack(MOVE.JAB);
+                    else                      fighter.startAttack(MOVE.KICK);
                 }
                 fighter._atAction = 'idle';
-            }
-        } else {
-            // Enemy is very aggressive — short timer, always closing in, attacks constantly
-            fighter._atDecTimer = 6 + Math.floor(Math.random() * 10);
-            if (dist > 100) {
-                fighter._atAction = 'approach';
             } else {
-                if (fighter.canAttack()) {
-                    const r = Math.random();
-                    if (r < 0.45)      { fighter.startAttack(MOVE.JAB); }
-                    else if (r < 0.75) { fighter.startAttack(MOVE.KICK); }
-                    else               { fighter.startAttack(MOVE.UPPERCUT); }
-                    fighter._atAction = 'idle';
-                } else {
-                    fighter._atAction = 'approach';
-                }
+                // Still recovering — keep pressing in
+                fighter._atAction = 'approach';
             }
         }
 
-        // Execute newly chosen action
+        // Execute immediately
         if (!fighter.canMove()) return;
         switch (fighter._atAction) {
             case 'approach': fighter.walkForward(); break;
-            case 'retreat': fighter.startBlocking(); fighter.walkBack(); break;
-            case 'jump': fighter.jump(); break;
-            default: fighter.idle(); break;
+            case 'retreat':  fighter.startBlocking(); fighter.walkBack(); break;
+            default:         fighter.idle(); break;
         }
     }
 
