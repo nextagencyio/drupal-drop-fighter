@@ -152,7 +152,7 @@ function drawMotionLines(ctx, x, y, length, angle, count = 3) {
 // 1. drawDrupalDrop — THE HERO (redesigned)
 // ============================================================
 export function drawDrupalDrop(ctx, x, y, facing, frame, options = {}) {
-    const { state = 'idle', move = '', hp = 100, headDetached = false, flashTimer = 0, attackFrame = 0 } = options;
+    const { state = 'idle', move = '', hp = 100, headDetached = false, flashTimer = 0, attackFrame = 0, stateTimer = 0 } = options;
 
     ctx.save();
     ctx.translate(x, y);
@@ -187,7 +187,18 @@ export function drawDrupalDrop(ctx, x, y, facing, frame, options = {}) {
         case 'hit_stun': { const p = Math.min(attackFrame / 12, 1); lean = 0.25; ox = -8 * (1 - p); oy = -3 * Math.sin(p * Math.PI); break; }
         case 'knockdown': { const p = Math.min(attackFrame / ANIM.KNOCKDOWN_FRAMES, 1); lean = 0.3 + p * 1.2; oy = p * 30; ox = -p * 15; squash = 1 - p * 0.3; break; }
         case 'blocking': lean = 0.15; ox = -3; rArmAng = 0.3; lArmAng = 0.3; legSpr = 0.35; crouch = 0.1; break;
-        case 'ko': { const p = Math.min(attackFrame / ANIM.KO_FRAMES, 1); lean = 0.3 + p * 1.3; oy = p * 40; ox = -p * 20; squash = 1 - p * 0.4; break; }
+        case 'ko': {
+            // Fall sideways — stateTimer drives the fall so it works with slow-mo
+            const p = Math.min(stateTimer / 40, 1);
+            lean = p * (Math.PI / 2 + 0.15); // tip fully horizontal then slightly past
+            oy = p * 55;
+            ox = -p * 30;
+            squash = 1 - p * 0.25;
+            rArmAng = -0.3 + p * 1.2;  // arms flop outward
+            lArmAng = 0.4 + p * 0.8;
+            legSpr = 0.3 + p * 0.6;
+            break;
+        }
         case 'win_pose': oy = Math.sin(frame * 0.05) * 2; rArmAng = -1.5; rArmExt = 0.6; lean = -0.1; lArmAng = -1.2; break;
         case 'celebrate': {
             // Repeatedly jump up and down with arms raised
@@ -470,6 +481,7 @@ export function drawMonolith(ctx, x, y, facing, frame, options = {}) {
         hp = 100,
         flashTimer = 0,
         attackFrame = 0,
+        stateTimer = 0,
         round = 1,
     } = options;
 
@@ -553,10 +565,11 @@ export function drawMonolith(ctx, x, y, facing, frame, options = {}) {
             crouchAmount = 0.08;
             break;
         case 'ko': {
-            const p = Math.min(attackFrame / ANIM.KO_FRAMES, 1);
+            const p = Math.min(stateTimer / 40, 1);
             crumbleProgress = p;
-            torsoLean = p * 0.5;
-            bodyOffsetY = p * 45;
+            torsoLean = p * (Math.PI / 2 + 0.1); // tip fully sideways
+            bodyOffsetY = p * 50;
+            bodyOffsetX = -p * 25;
             break;
         }
         case 'win_pose':

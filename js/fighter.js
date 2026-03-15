@@ -766,6 +766,7 @@ export class Fighter {
             hp: this.hp,
             animFrame: this.animFrame,
             attackFrame: this.attackFrame,
+            stateTimer: this.stateTimer,
             flashTimer: this.flashTimer,
             blocking: this.isBlocking,
             crouching: this.state === FIGHTER_STATE.CROUCH,
