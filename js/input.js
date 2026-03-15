@@ -16,7 +16,6 @@ const KEY_MAP = {
     KeyX:       'punch',
     KeyZ:       'kick',
     KeyC:       'special1',
-    KeyV:       'special2',
     KeyB:       'special3',
     x:          'punch',
     X:          'punch',
@@ -24,8 +23,6 @@ const KEY_MAP = {
     Z:          'kick',
     c:          'special1',
     C:          'special1',
-    v:          'special2',
-    V:          'special2',
     b:          'special3',
     B:          'special3',
 

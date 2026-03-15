@@ -31,7 +31,6 @@ export class Player extends Fighter {
             case MOVE.UPPERCUT:   return HITBOXES.UPPERCUT;
             case MOVE.SWEEP:      return HITBOXES.SWEEP;
             case MOVE.HOOK:       return HITBOXES.HOOK;
-            case MOVE.SHORYUKEN:  return HITBOXES.SHORYUKEN;
             case MOVE.HEAD_THROW: return { x: 0, y: 0, w: 0, h: 0, startup: 5, active: 3, recovery: 12 };
             case MOVE.SPIN_KICK:  return HITBOXES.SPIN_KICK;
             default:              return null;
@@ -47,7 +46,6 @@ export class Player extends Fighter {
             case MOVE.SWEEP:      return DAMAGE.SWEEP;
             case MOVE.HOOK:       return DAMAGE.HOOK;
             case MOVE.HEAD_THROW: return DAMAGE.HEAD_THROW;
-            case MOVE.SHORYUKEN:  return DAMAGE.SHORYUKEN;
             case MOVE.SPIN_KICK:  return DAMAGE.SPIN_KICK;
             default:              return 0;
         }
@@ -63,7 +61,6 @@ export class Player extends Fighter {
             case MOVE.SWEEP:
                 return FIGHTER.HITSTUN_MEDIUM;
             case MOVE.UPPERCUT:
-            case MOVE.SHORYUKEN:
             case MOVE.SPIN_KICK:
                 return FIGHTER.HITSTUN_HEAVY;
             default:
@@ -79,7 +76,6 @@ export class Player extends Fighter {
     /** Knockback force — specials hit harder. */
     getMoveKnockback() {
         switch (this.currentMove) {
-            case MOVE.SHORYUKEN:
             case MOVE.SWEEP:
             case MOVE.HEAD_THROW:
             case MOVE.SPIN_KICK:
@@ -101,20 +97,15 @@ export class Player extends Fighter {
         // Skip all input when incapacitated or in a cinematic
         if (this.isIncapacitated() || this.isInCinematic()) return;
 
-        // ── 0. Single-key specials (C, V, B) ──
+        // ── 0. Single-key specials (C, B) ──
         if (inputManager.special1Pressed && this.canAttack()) {
             this._startSpecialMove(MOVE.HEAD_THROW);
-            return;
-        }
-        if (inputManager.special2Pressed && this.canAttack()) {
-            this._startSpecialMove(MOVE.SHORYUKEN);
             return;
         }
         if (inputManager.special3Pressed && this.canAttack()) {
             this._startSpecialMove(MOVE.SPIN_KICK);
             return;
         }
-
 
         // Determine facing-relative directions
         const forwardHeld = this.facing === 1 ? inputManager.isRight : inputManager.isLeft;
@@ -187,12 +178,6 @@ export class Player extends Fighter {
         switch (move) {
             case MOVE.HEAD_THROW:
                 this._launchHead();
-                break;
-
-            case MOVE.SHORYUKEN:
-                // Rising uppercut — upward velocity + slight forward
-                this.vy = FIGHTER.JUMP_FORCE * 0.8;
-                this.vx = FIGHTER.WALK_SPEED * 0.5 * this.facing;
                 break;
 
             case MOVE.SPIN_KICK:
