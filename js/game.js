@@ -75,12 +75,6 @@ export class Game {
             case GAME_STATE.ROUND_OVER:
                 this.updateRoundOver();
                 break;
-            case GAME_STATE.MATCH_CELEBRATION:
-                this.stateTimer++;
-                this.player.update();
-                this.enemy.update();
-                this.updateMatchCelebration();
-                break;
             case GAME_STATE.MATCH_OVER:
                 // Static — waiting for player input via HUD
                 break;
@@ -317,12 +311,7 @@ export class Game {
 
         // --- AI ---
         if (this.attractMode) {
-            // In demo mode the enemy just walks toward the hero — no attacks
-            if (!this.enemy.isIncapacitated()) {
-                const d = this.enemy.distanceTo(this.player);
-                if (d > 180) this.enemy.walkForward();
-                else this.enemy.idle();
-            }
+            this._attractAiUpdate(this.enemy, this.player);
         } else {
             this.enemy.aiUpdate(this.player);
         }
@@ -541,23 +530,12 @@ export class Game {
     // ---------------------------------------------------------
 
     matchOver(winner) {
-        this._matchWinner = winner;
-        this.player.setState(FIGHTER_STATE.CELEBRATE);
-        this.enemy.setState(FIGHTER_STATE.KO);
-        this.changeState(GAME_STATE.MATCH_CELEBRATION);
-    }
-
-    updateMatchCelebration() {
-        // Hold the win pose for ~3 seconds before resolving
-        if (this.stateTimer < 180) return;
-
-        // In attract mode: loop back to demo
+        // In attract mode: loop the demo
         if (this.attractMode) {
             this.changeState(GAME_STATE.ATTRACT);
             return;
         }
 
-        const winner = this._matchWinner;
         this.changeState(GAME_STATE.MATCH_OVER);
 
         if (winner === 'player') {
@@ -569,7 +547,6 @@ export class Game {
             this.hud.showWinScreen('enemy', theme.loseQuote);
         }
 
-        // Restart handler
         this.hud.onRestart(() => this.restart());
     }
 
