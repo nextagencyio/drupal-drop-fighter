@@ -163,7 +163,8 @@ export class Game {
 
         if (dist > 180) {
             // Far away — both rush in; hero may throw head
-            if (isHero && !this.player.headDetached && Math.random() < 0.4 && fighter.canAttack()) {
+            const heroCanFightBack = !this.attractMode || this._scriptedEnemyHits >= 5;
+            if (isHero && heroCanFightBack && !this.player.headDetached && Math.random() < 0.4 && fighter.canAttack()) {
                 fighter._startSpecialMove(MOVE.HEAD_THROW);
                 fighter._atDecTimer = 25; // wait for projectile to travel
             }
@@ -184,25 +185,31 @@ export class Game {
 
         } else if (dist <= 130) {
             // Close brawl range — enemy hitboxes reliably connect here
+            const heroCanFightBack = !this.attractMode || this._scriptedEnemyHits >= 5;
             if (fighter.canAttack()) {
-                if (isHero) {
+                if (isHero && heroCanFightBack) {
                     const r = Math.random();
                     if (r < 0.28)      fighter.startAttack(MOVE.JAB);
                     else if (r < 0.50) fighter.startAttack(MOVE.KICK);
                     else if (r < 0.68) fighter.startAttack(MOVE.UPPERCUT);
                     else               fighter.startAttack(MOVE.HOOK);
-                } else {
+                    fighter._atAction = 'idle';
+                } else if (!isHero) {
                     if (Math.random() < 0.55) fighter.startAttack(MOVE.JAB);
                     else                      fighter.startAttack(MOVE.KICK);
+                    fighter._atAction = 'idle';
+                } else {
+                    // Hero during scripted phase — just take the hits
+                    fighter._atAction = 'idle';
                 }
-                fighter._atAction = 'idle';
             } else {
                 fighter._atAction = 'approach';
             }
 
         } else {
-            // 130-180px — hero can poke, enemy closes in to land hitbox
-            if (isHero && fighter.canAttack()) {
+            // 130-180px — hero can poke (after scripted phase), enemy closes in
+            const heroCanFightBack = !this.attractMode || this._scriptedEnemyHits >= 5;
+            if (isHero && heroCanFightBack && fighter.canAttack()) {
                 const r = Math.random();
                 if (r < 0.28)      fighter.startAttack(MOVE.JAB);
                 else if (r < 0.50) fighter.startAttack(MOVE.KICK);
@@ -257,6 +264,9 @@ export class Game {
         this.particles = [];
         this._playerTrashTalkTimer = 90;  // player talks first ~1.5s in
         this._trashTalkTimer = 180;      // enemy responds ~3s in
+
+        // Scripted opening: enemy lands first 5 hits before hero fights back
+        this._scriptedEnemyHits = 0;
 
         // Update HUD
         this.hud.setHealth(1, this.player.hp, FIGHTER.MAX_HP);
@@ -391,6 +401,12 @@ export class Game {
         const causesKnockdown = attacker.getMoveKnockdown();
 
         const result = defender.takeDamage(damage, knockback, hitstun, causesKnockdown);
+
+        // Track scripted opening hits
+        if (this.attractMode && attacker === this.enemy && defender === this.player &&
+            result !== 'immune' && this._scriptedEnemyHits < 5) {
+            this._scriptedEnemyHits++;
+        }
 
         // Trigger effects based on result
         this.onHitResult(result, attacker, defender);
