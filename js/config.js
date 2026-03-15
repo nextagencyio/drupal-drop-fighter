@@ -96,32 +96,32 @@ export const FIGHTER = {
 // --- Damage Values ---
 export const DAMAGE = {
     // Player moves
-    JAB: 6,
-    KICK: 8,
-    UPPERCUT: 12,
-    SWEEP: 10,
-    HOOK: 10,
-    HEAD_THROW: 18,
-    SHORYUKEN: 20,
-    SPIN_KICK: 15,
+    JAB: 3,
+    KICK: 4,
+    UPPERCUT: 6,
+    SWEEP: 5,
+    HOOK: 5,
+    HEAD_THROW: 9,
+    SHORYUKEN: 10,
+    SPIN_KICK: 7,
 
     // Enemy moves (Round 1)
-    LAG_SPIKE: 8,
-    CACHE_MISS: 7,
-    BUFFERING_BLAST: 14,
-    TIMEOUT_SLAM: 18,
+    LAG_SPIKE: 4,
+    CACHE_MISS: 3,
+    BUFFERING_BLAST: 7,
+    TIMEOUT_SLAM: 9,
 
     // Enemy moves (Round 2)
-    CONTRACT_BIND: 9,
-    PROPRIETARY_HOOK: 8,
+    CONTRACT_BIND: 4,
+    PROPRIETARY_HOOK: 4,
     LICENSE_WALL: 0,  // barrier, no direct damage
-    MIGRATION_BLOCK: 16,
+    MIGRATION_BLOCK: 8,
 
     // Enemy moves (Round 3)
-    TEMPLATE_ERROR: 10,
-    STACK_TRACE_SLAM: 12,
-    SYNTAX_EXCEPTION: 16,
-    WSOD_ATTACK: 22,
+    TEMPLATE_ERROR: 5,
+    STACK_TRACE_SLAM: 6,
+    SYNTAX_EXCEPTION: 8,
+    WSOD_ATTACK: 11,
 
     // Block chip damage multiplier
     CHIP_MULTIPLIER: 0.15,
