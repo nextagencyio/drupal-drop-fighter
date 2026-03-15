@@ -156,7 +156,10 @@ export class Game {
 
         // New decision — short timer keeps exchanges snappy
         fighter.stopBlocking();
-        fighter._atDecTimer = 6 + Math.floor(Math.random() * 8); // 6-13 frames
+        // Enemy chases with shorter timer so it re-engages faster after knockback
+        fighter._atDecTimer = isHero
+            ? 6 + Math.floor(Math.random() * 8)   // hero: 6-13 frames
+            : 4 + Math.floor(Math.random() * 6);  // enemy: 4-9 frames
 
         if (dist > 180) {
             // Far away — both rush in; hero may throw head
@@ -166,29 +169,47 @@ export class Game {
             }
             fighter._atAction = 'approach';
 
-        } else if (dist < 60) {
-            // Point-blank overlap — back off briefly then re-engage
-            fighter._atAction = 'retreat';
-            fighter._atDecTimer = 8 + Math.floor(Math.random() * 6);
+        } else if (dist < 55) {
+            // Point-blank — hero backs off, enemy stays and attacks
+            if (isHero) {
+                fighter._atAction = 'retreat';
+                fighter._atDecTimer = 8 + Math.floor(Math.random() * 6);
+            } else {
+                if (fighter.canAttack()) {
+                    if (Math.random() < 0.55) fighter.startAttack(MOVE.JAB);
+                    else                      fighter.startAttack(MOVE.KICK);
+                }
+                fighter._atAction = 'idle';
+            }
 
-        } else {
-            // Brawl range (60-180px) — trade hits
+        } else if (dist <= 130) {
+            // Close brawl range — enemy hitboxes reliably connect here
             if (fighter.canAttack()) {
                 if (isHero) {
-                    // Hero: faster move set, mix of jab/kick/uppercut/hook
                     const r = Math.random();
                     if (r < 0.28)      fighter.startAttack(MOVE.JAB);
                     else if (r < 0.50) fighter.startAttack(MOVE.KICK);
                     else if (r < 0.68) fighter.startAttack(MOVE.UPPERCUT);
                     else               fighter.startAttack(MOVE.HOOK);
                 } else {
-                    // Enemy: jab/kick only
                     if (Math.random() < 0.55) fighter.startAttack(MOVE.JAB);
                     else                      fighter.startAttack(MOVE.KICK);
                 }
                 fighter._atAction = 'idle';
             } else {
-                // Still recovering — keep pressing in
+                fighter._atAction = 'approach';
+            }
+
+        } else {
+            // 130-180px — hero can poke, enemy closes in to land hitbox
+            if (isHero && fighter.canAttack()) {
+                const r = Math.random();
+                if (r < 0.28)      fighter.startAttack(MOVE.JAB);
+                else if (r < 0.50) fighter.startAttack(MOVE.KICK);
+                else if (r < 0.68) fighter.startAttack(MOVE.UPPERCUT);
+                else               fighter.startAttack(MOVE.HOOK);
+                fighter._atAction = 'idle';
+            } else {
                 fighter._atAction = 'approach';
             }
         }
