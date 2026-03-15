@@ -68,18 +68,18 @@ export const FIGHTER = {
     CROUCH_HEIGHT: 120,
 
     // Physics
-    WALK_SPEED: 3.5,
-    JUMP_FORCE: -15,
-    GRAVITY: 0.72,
+    WALK_SPEED: 2.5,
+    JUMP_FORCE: -12,
+    GRAVITY: 0.55,
     KNOCKBACK_FORCE: 14,
     KNOCKBACK_HEAVY: 22,
     PUSH_APART_SPEED: 2,
 
     // State timings (in frames at 60fps)
-    HITSTUN_LIGHT: 12,
-    HITSTUN_MEDIUM: 18,
-    HITSTUN_HEAVY: 24,
-    BLOCKSTUN: 8,
+    HITSTUN_LIGHT: 18,
+    HITSTUN_MEDIUM: 26,
+    HITSTUN_HEAVY: 34,
+    BLOCKSTUN: 12,
     KNOCKDOWN_DURATION: 45,
     WAKEUP_INVULN: 15,
     KO_DURATION: 90,
@@ -282,7 +282,7 @@ export const ANIM = {
     IDLE_SPEED: 10,        // ticks per frame
     WALK_FRAMES: 4,
     WALK_SPEED: 6,
-    ATTACK_SPEED: 3,       // ticks per frame for attack anims
+    ATTACK_SPEED: 5,       // ticks per frame for attack anims
     HIT_FLASH_FRAMES: 3,
     KNOCKDOWN_FRAMES: 6,
     KO_FRAMES: 8,
