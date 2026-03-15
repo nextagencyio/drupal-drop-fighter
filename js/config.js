@@ -71,8 +71,8 @@ export const FIGHTER = {
     WALK_SPEED: 3.5,
     JUMP_FORCE: -15,
     GRAVITY: 0.72,
-    KNOCKBACK_FORCE: 6,
-    KNOCKBACK_HEAVY: 10,
+    KNOCKBACK_FORCE: 14,
+    KNOCKBACK_HEAVY: 22,
     PUSH_APART_SPEED: 2,
 
     // State timings (in frames at 60fps)
