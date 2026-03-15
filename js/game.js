@@ -363,7 +363,9 @@ export class Game {
         attacker.registerHit();
 
         const damage = attacker.getMoveDamage();
-        const knockback = attacker.getMoveKnockback();
+        const baseKnockback = attacker.getMoveKnockback();
+        // Hero flies back further than the enemy (heavy boss feel)
+        const knockback = defender === this.player ? baseKnockback * 1.8 : baseKnockback * 0.7;
         const hitstun = attacker.getMoveHitstun();
         const causesKnockdown = attacker.getMoveKnockdown();
 
