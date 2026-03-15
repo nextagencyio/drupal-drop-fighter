@@ -82,7 +82,10 @@ document.getElementById('game-canvas').addEventListener('click', onInsertCoin);
 // ---------------------------------------------------------
 
 let bgFrame = 0;
-let hitstopFrames = 0; // pause game for dramatic effect on big hits
+let hitstopFrames = 0;   // pause game for dramatic effect on big hits
+let slowMotionFrames = 0; // slow-mo on KO
+let slowMotionCounter = 0;
+const SLOW_RATIO = 4;    // update every 4th frame = 25% speed
 
 // ---------------------------------------------------------
 // Game Loop
@@ -100,6 +103,17 @@ function gameLoop() {
         return;
     }
 
+    // Slow motion: update only every SLOW_RATIO real frames
+    if (slowMotionFrames > 0) {
+        slowMotionCounter++;
+        if (slowMotionCounter < SLOW_RATIO) {
+            render();
+            return;
+        }
+        slowMotionCounter = 0;
+        slowMotionFrames--;
+    }
+
     // --- Update ---
     game.update();
 
@@ -107,6 +121,13 @@ function gameLoop() {
     if (game._hitstopRequest > 0) {
         hitstopFrames = game._hitstopRequest;
         game._hitstopRequest = 0;
+    }
+
+    // Check for slow motion trigger (KO)
+    if (game._slowMotionRequest > 0) {
+        slowMotionFrames = game._slowMotionRequest;
+        game._slowMotionRequest = 0;
+        slowMotionCounter = 0;
     }
 
     // --- Render ---

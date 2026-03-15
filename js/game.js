@@ -45,6 +45,11 @@ export class Game {
 
         // Hitstop — main.js reads this
         this._hitstopRequest = 0;
+
+        // Slow motion on KO — main.js reads this
+        this._slowMotionRequest = 0;
+        this._koDetected = false;
+        this._koEndDelay = 0;
     }
 
     // ---------------------------------------------------------
@@ -268,6 +273,10 @@ export class Game {
         // Scripted opening: enemy lands first 5 hits before hero fights back
         this._scriptedEnemyHits = 0;
 
+        // KO slow motion state
+        this._koDetected = false;
+        this._koEndDelay = 0;
+
         // Update HUD
         this.hud.setHealth(1, this.player.hp, FIGHTER.MAX_HP);
         this.hud.setHealth(2, this.enemy.hp, FIGHTER.MAX_HP);
@@ -371,10 +380,27 @@ export class Game {
         this.hud.setTimer(seconds);
 
         // --- Check round end conditions ---
-        if (!this.enemy.alive) {
-            this.endRound('player');
-        } else if (!this.player.alive || this.roundTimer <= 0) {
-            // In attract mode hero always wins; in real game use health
+        const someoneKo = !this.enemy.alive || !this.player.alive;
+        if (someoneKo) {
+            if (!this._koDetected) {
+                this._koDetected = true;
+                this._koEndDelay = 50;        // game-frames before transitioning (plays in slo-mo)
+                this._slowMotionRequest = 55; // main.js slows updates to ~25% speed
+            }
+            if (this._koEndDelay > 0) {
+                this._koEndDelay--;
+                return; // hold here — let fighter fall in slow motion
+            }
+            if (!this.enemy.alive) {
+                this.endRound('player');
+            } else {
+                if (this.attractMode || this.player.hp >= this.enemy.hp) {
+                    this.endRound('player');
+                } else {
+                    this.endRound('enemy');
+                }
+            }
+        } else if (this.roundTimer <= 0) {
             if (this.attractMode || this.player.hp >= this.enemy.hp) {
                 this.endRound('player');
             } else {
