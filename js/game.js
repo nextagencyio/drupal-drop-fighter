@@ -234,8 +234,8 @@ export class Game {
 
         // Clear particles and stagger trash talk timers
         this.particles = [];
-        this._playerTrashTalkTimer = 210; // player talks first ~3.5s in
-        this._trashTalkTimer = 420;       // enemy responds ~7s in
+        this._playerTrashTalkTimer = 90;  // player talks first ~1.5s in
+        this._trashTalkTimer = 180;      // enemy responds ~3s in
 
         // Update HUD
         this.hud.setHealth(1, this.player.hp, FIGHTER.MAX_HP);
@@ -614,7 +614,7 @@ export class Game {
     // ---------------------------------------------------------
 
     updateTrashTalk() {
-        const interval = () => 330 + Math.floor(Math.random() * 150);
+        const interval = () => 240 + Math.floor(Math.random() * 120); // 4-6s between lines
 
         // Enemy trash talk
         this._trashTalkTimer--;
