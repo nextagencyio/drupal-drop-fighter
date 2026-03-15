@@ -174,50 +174,84 @@
             box-shadow: 0 0 8px #ffcc0088;
         }
 
-        /* Hero trash talk (left side) */
+        /* Hero trash talk (left side) — speech bubble */
         #player-trash-talk {
             position: absolute;
             top: 18%; left: 4%;
-            max-width: 280px;
-            font-size: 22px; font-weight: bold;
+            max-width: 260px;
+            font-size: 15px; font-weight: bold;
             font-style: italic;
-            color: #5BC0F8;
-            text-shadow: 1px 1px 0 #000, 0 0 12px rgba(91,192,248,0.4);
-            text-transform: none;
-            letter-spacing: 0.3px;
-            line-height: 1.35;
+            color: #fff;
+            background: rgba(6, 120, 190, 0.88);
+            border: 2px solid #5BC0F8;
+            border-radius: 16px;
+            padding: 10px 14px;
+            line-height: 1.4;
             opacity: 0;
-            transition: opacity 0.4s ease-in;
+            transition: opacity 0.3s ease-in;
             pointer-events: none;
+        }
+        /* Tail pointing right toward the fighter */
+        #player-trash-talk.visible::after {
+            content: '';
+            position: absolute;
+            bottom: -12px; left: 24px;
+            border: 6px solid transparent;
+            border-top-color: #5BC0F8;
+        }
+        #player-trash-talk.visible::before {
+            content: '';
+            position: absolute;
+            bottom: -9px; left: 25px;
+            border: 5px solid transparent;
+            border-top-color: rgba(6, 120, 190, 0.88);
+            z-index: 1;
         }
         #player-trash-talk.visible {
             opacity: 1;
-            animation: trash-fade 0.5s ease-out;
+            animation: trash-fade 0.35s ease-out;
         }
 
-        /* Enemy trash talk (right side) */
+        /* Enemy trash talk (right side) — speech bubble */
         #move-announcement {
             position: absolute;
             top: 18%; right: 4%;
-            max-width: 280px;
-            font-size: 22px; font-weight: bold;
+            max-width: 260px;
+            font-size: 15px; font-weight: bold;
             font-style: italic;
-            color: #ff8866;
-            text-shadow: 1px 1px 0 #000;
-            text-transform: none;
-            letter-spacing: 0.3px;
-            line-height: 1.35;
+            color: #fff;
+            background: rgba(80, 20, 10, 0.88);
+            border: 2px solid #ff6644;
+            border-radius: 16px;
+            padding: 10px 14px;
+            line-height: 1.4;
             opacity: 0;
-            transition: opacity 0.4s ease-in;
+            transition: opacity 0.3s ease-in;
             pointer-events: none;
+        }
+        /* Tail pointing left toward the fighter */
+        #move-announcement.visible::after {
+            content: '';
+            position: absolute;
+            bottom: -12px; right: 24px;
+            border: 6px solid transparent;
+            border-top-color: #ff6644;
+        }
+        #move-announcement.visible::before {
+            content: '';
+            position: absolute;
+            bottom: -9px; right: 25px;
+            border: 5px solid transparent;
+            border-top-color: rgba(80, 20, 10, 0.88);
+            z-index: 1;
         }
         #move-announcement.visible {
             opacity: 1;
-            animation: trash-fade 0.5s ease-out;
+            animation: trash-fade 0.35s ease-out;
         }
         @keyframes trash-fade {
-            0% { opacity: 0; transform: translateY(-4px); }
-            100% { opacity: 1; transform: translateY(0); }
+            0% { opacity: 0; transform: translateY(-6px) scale(0.96); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         /* Controls bar at bottom */

@@ -310,7 +310,7 @@ export class HUD {
         if (!this.moveAnnouncement) return;
         if (this._moveTimer) clearTimeout(this._moveTimer);
 
-        this.moveAnnouncement.textContent = `"${line}"`;
+        this.moveAnnouncement.textContent = line;
         this.moveAnnouncement.classList.add('visible');
 
         this._moveTimer = setTimeout(() => {
@@ -323,7 +323,7 @@ export class HUD {
         if (!this.playerTrashTalk) return;
         if (this._playerTrashTimer) clearTimeout(this._playerTrashTimer);
 
-        this.playerTrashTalk.textContent = `"${line}"`;
+        this.playerTrashTalk.textContent = line;
         this.playerTrashTalk.classList.add('visible');
 
         this._playerTrashTimer = setTimeout(() => {
