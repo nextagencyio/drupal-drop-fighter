@@ -179,6 +179,7 @@ export const GAME_STATE = {
     FIGHT_FLASH: 'fight_flash',
     FIGHTING: 'fighting',
     ROUND_OVER: 'round_over',
+    MATCH_CELEBRATION: 'match_celebration',
     MATCH_OVER: 'match_over',
 };
 

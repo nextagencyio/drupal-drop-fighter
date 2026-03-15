@@ -75,6 +75,12 @@ export class Game {
             case GAME_STATE.ROUND_OVER:
                 this.updateRoundOver();
                 break;
+            case GAME_STATE.MATCH_CELEBRATION:
+                this.stateTimer++;
+                this.player.update();
+                this.enemy.update();
+                this.updateMatchCelebration();
+                break;
             case GAME_STATE.MATCH_OVER:
                 // Static — waiting for player input via HUD
                 break;
@@ -354,13 +360,11 @@ export class Game {
         this.hud.setTimer(seconds);
 
         // --- Check round end conditions ---
-        if (!this.player.alive) {
-            this.endRound('enemy');
-        } else if (!this.enemy.alive) {
+        if (!this.enemy.alive) {
             this.endRound('player');
-        } else if (this.roundTimer <= 0) {
-            // Time over — most health wins
-            if (this.player.hp >= this.enemy.hp) {
+        } else if (!this.player.alive || this.roundTimer <= 0) {
+            // In attract mode hero always wins; in real game use health
+            if (this.attractMode || this.player.hp >= this.enemy.hp) {
                 this.endRound('player');
             } else {
                 this.endRound('enemy');
@@ -537,12 +541,22 @@ export class Game {
     // ---------------------------------------------------------
 
     matchOver(winner) {
-        // In attract mode: just loop the demo battle
+        this._matchWinner = winner;
+        this.player.setState(FIGHTER_STATE.WIN_POSE);
+        this.changeState(GAME_STATE.MATCH_CELEBRATION);
+    }
+
+    updateMatchCelebration() {
+        // Hold the win pose for ~3 seconds before resolving
+        if (this.stateTimer < 180) return;
+
+        // In attract mode: loop back to demo
         if (this.attractMode) {
             this.changeState(GAME_STATE.ATTRACT);
             return;
         }
 
+        const winner = this._matchWinner;
         this.changeState(GAME_STATE.MATCH_OVER);
 
         if (winner === 'player') {
