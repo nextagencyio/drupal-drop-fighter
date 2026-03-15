@@ -17,6 +17,7 @@ const KEY_MAP = {
     KeyZ:       'kick',
     KeyC:       'special1',
     KeyV:       'special2',
+    KeyB:       'special3',
     x:          'punch',
     X:          'punch',
     z:          'kick',
@@ -25,6 +26,8 @@ const KEY_MAP = {
     C:          'special1',
     v:          'special2',
     V:          'special2',
+    b:          'special3',
+    B:          'special3',
 
 };
 
@@ -39,11 +42,11 @@ export class InputManager {
         this._held = {
             left: false, right: false, up: false, down: false,
             punch: false, kick: false,
-            special1: false, special2: false,
+            special1: false, special2: false, special3: false,
         };
 
-        this._justPressed = { punch: false, kick: false, special1: false, special2: false };
-        this._prevHeld = { punch: false, kick: false, special1: false, special2: false };
+        this._justPressed = { punch: false, kick: false, special1: false, special2: false, special3: false };
+        this._prevHeld = { punch: false, kick: false, special1: false, special2: false, special3: false };
 
         // ── Motion input buffer ──
         // Stores { dir, frame } entries for the last N frames.
@@ -145,11 +148,13 @@ export class InputManager {
         this._justPressed.kick     = this._held.kick     && !this._prevHeld.kick;
         this._justPressed.special1 = this._held.special1 && !this._prevHeld.special1;
         this._justPressed.special2 = this._held.special2 && !this._prevHeld.special2;
+        this._justPressed.special3 = this._held.special3 && !this._prevHeld.special3;
 
         this._prevHeld.punch    = this._held.punch;
         this._prevHeld.kick     = this._held.kick;
         this._prevHeld.special1 = this._held.special1;
         this._prevHeld.special2 = this._held.special2;
+        this._prevHeld.special3 = this._held.special3;
 
         // ── Update motion buffer ──
         const currentDir = this.direction;
@@ -225,6 +230,7 @@ export class InputManager {
 
     get special1Pressed() { return this._justPressed.special1; }
     get special2Pressed() { return this._justPressed.special2; }
+    get special3Pressed() { return this._justPressed.special3; }
 
     // ────────────────────────────────────────────
     // Motion input detection

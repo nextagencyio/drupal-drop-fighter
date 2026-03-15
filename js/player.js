@@ -33,6 +33,7 @@ export class Player extends Fighter {
             case MOVE.HOOK:       return HITBOXES.HOOK;
             case MOVE.SHORYUKEN:  return HITBOXES.SHORYUKEN;
             case MOVE.HEAD_THROW: return { x: 0, y: 0, w: 0, h: 0, startup: 5, active: 3, recovery: 12 };
+            case MOVE.SPIN_KICK:  return HITBOXES.SPIN_KICK;
             default:              return null;
         }
     }
@@ -47,6 +48,7 @@ export class Player extends Fighter {
             case MOVE.HOOK:       return DAMAGE.HOOK;
             case MOVE.HEAD_THROW: return DAMAGE.HEAD_THROW;
             case MOVE.SHORYUKEN:  return DAMAGE.SHORYUKEN;
+            case MOVE.SPIN_KICK:  return DAMAGE.SPIN_KICK;
             default:              return 0;
         }
     }
@@ -62,6 +64,7 @@ export class Player extends Fighter {
                 return FIGHTER.HITSTUN_MEDIUM;
             case MOVE.UPPERCUT:
             case MOVE.SHORYUKEN:
+            case MOVE.SPIN_KICK:
                 return FIGHTER.HITSTUN_HEAVY;
             default:
                 return FIGHTER.HITSTUN_LIGHT;
@@ -79,6 +82,7 @@ export class Player extends Fighter {
             case MOVE.SHORYUKEN:
             case MOVE.SWEEP:
             case MOVE.HEAD_THROW:
+            case MOVE.SPIN_KICK:
                 return FIGHTER.KNOCKBACK_HEAVY;
             default:
                 return FIGHTER.KNOCKBACK_FORCE;
@@ -104,6 +108,10 @@ export class Player extends Fighter {
         }
         if (inputManager.special2Pressed && this.canAttack()) {
             this._startSpecialMove(MOVE.SHORYUKEN);
+            return;
+        }
+        if (inputManager.special3Pressed && this.canAttack()) {
+            this._startSpecialMove(MOVE.SPIN_KICK);
             return;
         }
 
@@ -185,6 +193,11 @@ export class Player extends Fighter {
                 // Rising uppercut — upward velocity + slight forward
                 this.vy = FIGHTER.JUMP_FORCE * 0.8;
                 this.vx = FIGHTER.WALK_SPEED * 0.5 * this.facing;
+                break;
+
+            case MOVE.SPIN_KICK:
+                // Lunging spin kick — forward dash
+                this.vx = FIGHTER.WALK_SPEED * 2.2 * this.facing;
                 break;
 
 
