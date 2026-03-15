@@ -45,12 +45,17 @@ const game = new Game(hud, audio, input);
 const controlsBar = document.getElementById('controls-bar');
 controlsBar.style.display = 'none';
 
+// Hide HUD until demo starts
+const hud_el = document.getElementById('hud');
+hud_el.style.visibility = 'hidden';
+
 // Title screen — shown until first click/keydown, satisfies browser autoplay policy
 let titleActive = true;
 
 function startDemo() {
     if (!titleActive) return;
     titleActive = false;
+    hud_el.style.visibility = '';
     audio.init();
     audio.startMenuMusic();
 }
