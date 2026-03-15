@@ -156,48 +156,38 @@ export class Game {
 
         // Make a new decision
         fighter.stopBlocking();
-        fighter._atDecTimer = 12 + Math.floor(Math.random() * 18);
 
         const isHero = fighter === this.player;
 
         if (isHero) {
-            // Hero is a zoner — stay at 150-250px and spam head throws
-            const idealMin = 150, idealMax = 260;
+            // Hero zones with head throws — slower decision cadence
+            fighter._atDecTimer = 18 + Math.floor(Math.random() * 20);
+            const idealMin = 160, idealMax = 280;
             if (dist < idealMin) {
-                // Too close — back up
                 fighter._atAction = 'retreat';
             } else if (dist > idealMax) {
-                // Too far — walk in a bit
                 fighter._atAction = 'approach';
             } else {
-                // Sweet spot — fire head throw (must use _startSpecialMove to launch the projectile)
                 if (fighter.canAttack()) {
                     fighter._startSpecialMove(MOVE.HEAD_THROW);
                 }
                 fighter._atAction = 'idle';
             }
         } else {
-            if (dist > 280) {
+            // Enemy is very aggressive — short timer, always closing in, attacks constantly
+            fighter._atDecTimer = 6 + Math.floor(Math.random() * 10);
+            if (dist > 100) {
                 fighter._atAction = 'approach';
-            } else if (dist < 90) {
+            } else {
                 if (fighter.canAttack()) {
                     const r = Math.random();
-                    if (r < 0.35)      { fighter.startAttack(MOVE.JAB); }
-                    else if (r < 0.6)  { fighter.startAttack(MOVE.KICK); }
-                    else if (r < 0.75) { fighter.startAttack(MOVE.UPPERCUT); }
-                    else if (r < 0.85) { fighter.jump(); }
-                    else               { fighter._atAction = 'retreat'; return; }
+                    if (r < 0.45)      { fighter.startAttack(MOVE.JAB); }
+                    else if (r < 0.75) { fighter.startAttack(MOVE.KICK); }
+                    else               { fighter.startAttack(MOVE.UPPERCUT); }
                     fighter._atAction = 'idle';
                 } else {
-                    fighter._atAction = Math.random() < 0.5 ? 'retreat' : 'idle';
+                    fighter._atAction = 'approach';
                 }
-            } else {
-                const roll = Math.random();
-                if (roll < 0.4)      { fighter._atAction = 'approach'; }
-                else if (roll < 0.65 && fighter.canAttack()) { fighter.startAttack(Math.random() < 0.5 ? MOVE.JAB : MOVE.KICK); fighter._atAction = 'idle'; }
-                else if (roll < 0.82) { fighter._atAction = 'retreat'; }
-                else if (roll < 0.92) { fighter._atAction = 'jump'; }
-                else                  { fighter._atAction = 'idle'; }
             }
         }
 
