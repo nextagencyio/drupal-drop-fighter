@@ -74,8 +74,16 @@ window.addEventListener('keydown', (e) => {
     if (titleActive) { startDemo(); return; }
     if (e.key === 'Enter') onInsertCoin();
 });
+window.addEventListener('touchstart', () => {
+    if (titleActive) startDemo();
+}, { once: true });
 
 document.getElementById('game-canvas').addEventListener('click', onInsertCoin);
+// Touch: fire immediately without waiting for click delay
+document.getElementById('game-canvas').addEventListener('touchend', (e) => {
+    e.preventDefault();
+    onInsertCoin();
+}, { passive: false });
 
 // ---------------------------------------------------------
 // Frame Counter & Hitstop

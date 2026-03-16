@@ -413,42 +413,70 @@
         #touch-controls {
             display: none;
             position: absolute; bottom: 0; left: 0; right: 0;
-            height: 140px;
+            height: 160px;
             pointer-events: auto;
+            align-items: flex-end;
+            justify-content: space-between;
+            padding: 10px 18px 14px;
+            background: linear-gradient(to top, rgba(0,0,0,0.55), transparent);
         }
         @media (pointer: coarse) {
-            #touch-controls { display: flex; justify-content: space-between; padding: 10px 16px; }
+            #touch-controls { display: flex; }
+            #controls-bar { display: none !important; }
         }
+
+        /* D-pad */
         .dpad {
-            width: 120px; height: 120px;
+            width: 136px; height: 136px;
             position: relative;
+            flex-shrink: 0;
         }
         .dpad button {
             position: absolute;
-            width: 40px; height: 40px;
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.25);
-            border-radius: 4px;
-            color: #fff; font-size: 18px;
+            width: 48px; height: 48px;
+            background: rgba(255,255,255,0.14);
+            border: 1.5px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            color: #fff; font-size: 20px; line-height: 1;
             touch-action: manipulation;
+            user-select: none; -webkit-user-select: none;
+            transition: background 0.05s, transform 0.05s;
         }
-        .dpad .up    { top: 0;   left: 40px; }
-        .dpad .down  { bottom: 0; left: 40px; }
-        .dpad .left  { top: 40px; left: 0; }
-        .dpad .right { top: 40px; right: 0; }
+        .dpad .up    { top: 0;   left: 44px; }
+        .dpad .down  { bottom: 0; left: 44px; }
+        .dpad .left  { top: 44px; left: 0; }
+        .dpad .right { top: 44px; right: 0; }
+        .dpad button:active {
+            background: rgba(255,255,255,0.38);
+            transform: scale(0.92);
+        }
+
+        /* Action button grid: 2×2 */
         .action-buttons {
-            display: flex; gap: 12px; align-items: center;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            flex-shrink: 0;
         }
         .action-buttons button {
-            width: 56px; height: 56px;
+            width: 64px; height: 64px;
             border-radius: 50%;
-            font-size: 16px; font-weight: bold;
+            font-size: 11px; font-weight: bold; line-height: 1.2;
             font-family: 'Courier New', monospace;
             touch-action: manipulation;
+            user-select: none; -webkit-user-select: none;
             border: 2px solid;
+            color: #fff;
+            transition: opacity 0.05s, transform 0.05s;
         }
-        .btn-punch { background: rgba(6,120,190,0.5); border-color: #0678BE; color: #fff; }
-        .btn-kick  { background: rgba(204,34,0,0.5); border-color: #CC2200; color: #fff; }
+        .action-buttons button:active {
+            opacity: 0.65;
+            transform: scale(0.9);
+        }
+        .btn-head-throw { background: rgba(6,120,190,0.65);  border-color: #29A3E0; }
+        .btn-spin-kick  { background: rgba(100,30,180,0.65); border-color: #9966DD; }
+        .btn-punch      { background: rgba(50,50,50,0.75);   border-color: #888; }
+        .btn-kick       { background: rgba(180,40,0,0.65);   border-color: #CC2200; }
     </style>
 </head>
 <body>
@@ -524,14 +552,16 @@
         <!-- Touch Controls -->
         <div id="touch-controls">
             <div class="dpad">
-                <button class="up" data-dir="up">↑</button>
-                <button class="down" data-dir="down">↓</button>
-                <button class="left" data-dir="left">←</button>
+                <button class="up"    data-dir="up">↑</button>
+                <button class="down"  data-dir="down">↓</button>
+                <button class="left"  data-dir="left">←</button>
                 <button class="right" data-dir="right">→</button>
             </div>
             <div class="action-buttons">
-                <button class="btn-punch" data-action="punch">X</button>
-                <button class="btn-kick" data-action="kick">Z</button>
+                <button class="btn-head-throw" data-action="special1">HEAD<br>THROW</button>
+                <button class="btn-spin-kick"  data-action="special3">SPIN<br>KICK</button>
+                <button class="btn-punch"      data-action="punch">PUNCH</button>
+                <button class="btn-kick"       data-action="kick">KICK</button>
             </div>
         </div>
     </div>
