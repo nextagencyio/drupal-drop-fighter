@@ -16,25 +16,25 @@ import {
 // ---------------------------------------------------------
 const ROUND_DIFFICULTY = [
     {
-        // Round 0: Slow Performance — sluggish, long pauses
-        decisionIntervalExtra: 15,  // extra frames on top of AI.DECISION_INTERVAL
-        grabWeight: 0.15,           // chance to attempt grab at close range
-        attackBias: 0.55,           // base chance to attack vs other options at point-blank
-        walkSpeedMultiplier: 0.75,  // fraction of normal walk speed
-    },
-    {
-        // Round 1: Vendor Lock-In — medium speed, more grabs, better blocks
-        decisionIntervalExtra: 5,
-        grabWeight: 0.30,
+        // Round 0: Slow Performance — still dangerous, shorter pauses
+        decisionIntervalExtra: 8,
+        grabWeight: 0.20,
         attackBias: 0.65,
-        walkSpeedMultiplier: 0.90,
+        walkSpeedMultiplier: 0.85,
     },
     {
-        // Round 2: Twig Debugging — fast, aggressive, more specials
-        decisionIntervalExtra: -5,  // faster than base interval
-        grabWeight: 0.25,
+        // Round 1: Vendor Lock-In — fast, more grabs, relentless
+        decisionIntervalExtra: 0,
+        grabWeight: 0.35,
         attackBias: 0.75,
-        walkSpeedMultiplier: 1.0,
+        walkSpeedMultiplier: 0.95,
+    },
+    {
+        // Round 2: Twig Debugging — brutal, very fast, aggressive
+        decisionIntervalExtra: -8,
+        grabWeight: 0.30,
+        attackBias: 0.85,
+        walkSpeedMultiplier: 1.1,
     },
 ];
 

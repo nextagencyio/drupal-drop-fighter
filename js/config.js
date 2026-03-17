@@ -68,18 +68,18 @@ export const FIGHTER = {
     CROUCH_HEIGHT: 120,
 
     // Physics
-    WALK_SPEED: 2.5,
-    JUMP_FORCE: -12,
-    GRAVITY: 0.55,
-    KNOCKBACK_FORCE: 14,
-    KNOCKBACK_HEAVY: 22,
-    PUSH_APART_SPEED: 2,
+    WALK_SPEED: 3.2,
+    JUMP_FORCE: -13,
+    GRAVITY: 0.6,
+    KNOCKBACK_FORCE: 16,
+    KNOCKBACK_HEAVY: 24,
+    PUSH_APART_SPEED: 2.5,
 
     // State timings (in frames at 60fps)
-    HITSTUN_LIGHT: 18,
-    HITSTUN_MEDIUM: 26,
-    HITSTUN_HEAVY: 34,
-    BLOCKSTUN: 12,
+    HITSTUN_LIGHT: 14,
+    HITSTUN_MEDIUM: 20,
+    HITSTUN_HEAVY: 28,
+    BLOCKSTUN: 10,
     KNOCKDOWN_DURATION: 45,
     WAKEUP_INVULN: 15,
     KO_DURATION: 90,
@@ -106,22 +106,22 @@ export const DAMAGE = {
     SPIN_KICK: 7,
 
     // Enemy moves (Round 1)
-    LAG_SPIKE: 4,
-    CACHE_MISS: 3,
-    BUFFERING_BLAST: 7,
-    TIMEOUT_SLAM: 9,
+    LAG_SPIKE: 6,
+    CACHE_MISS: 5,
+    BUFFERING_BLAST: 10,
+    TIMEOUT_SLAM: 13,
 
     // Enemy moves (Round 2)
-    CONTRACT_BIND: 4,
-    PROPRIETARY_HOOK: 4,
+    CONTRACT_BIND: 7,
+    PROPRIETARY_HOOK: 6,
     LICENSE_WALL: 0,  // barrier, no direct damage
-    MIGRATION_BLOCK: 8,
+    MIGRATION_BLOCK: 12,
 
     // Enemy moves (Round 3)
-    TEMPLATE_ERROR: 5,
-    STACK_TRACE_SLAM: 6,
-    SYNTAX_EXCEPTION: 8,
-    WSOD_ATTACK: 11,
+    TEMPLATE_ERROR: 8,
+    STACK_TRACE_SLAM: 9,
+    SYNTAX_EXCEPTION: 12,
+    WSOD_ATTACK: 16,
 
     // Block chip damage multiplier
     CHIP_MULTIPLIER: 0.15,
@@ -152,11 +152,11 @@ export const HITBOXES = {
 
 // --- Projectile ---
 export const PROJECTILE = {
-    SPEED: 7,
-    HEAD_THROW_SPEED: 5,
-    ENEMY_PROJECTILE_SPEED: 5,
+    SPEED: 8,
+    HEAD_THROW_SPEED: 6,
+    ENEMY_PROJECTILE_SPEED: 6,
     MAX_DISTANCE: 700,
-    RETURN_SPEED: 10,  // head returning to player
+    RETURN_SPEED: 12,  // head returning to player
 };
 
 // --- Round / Match ---
@@ -234,16 +234,16 @@ export const INPUT = {
 
 // --- AI ---
 export const AI = {
-    DECISION_INTERVAL: 20,     // frames between AI decisions
+    DECISION_INTERVAL: 15,     // frames between AI decisions
     REACT_DISTANCE_FAR: 300,
     REACT_DISTANCE_MID: 150,
     REACT_DISTANCE_CLOSE: 80,
-    BLOCK_CHANCE_BASE: 0.25,
-    BLOCK_CHANCE_PER_ROUND: 0.1,
-    SPECIAL_CHANCE_BASE: 0.08,
-    SPECIAL_CHANCE_PER_ROUND: 0.06,
-    APPROACH_CHANCE: 0.6,
-    RETREAT_CHANCE: 0.15,
+    BLOCK_CHANCE_BASE: 0.35,
+    BLOCK_CHANCE_PER_ROUND: 0.12,
+    SPECIAL_CHANCE_BASE: 0.12,
+    SPECIAL_CHANCE_PER_ROUND: 0.08,
+    APPROACH_CHANCE: 0.65,
+    RETREAT_CHANCE: 0.10,
 };
 
 // --- Round Theme Data ---
@@ -279,13 +279,13 @@ export const WIN_QUOTES = [
 // --- Animation Frames (for sprite drawing) ---
 export const ANIM = {
     IDLE_FRAMES: 4,
-    IDLE_SPEED: 10,        // ticks per frame
+    IDLE_SPEED: 8,         // ticks per frame
     WALK_FRAMES: 4,
-    WALK_SPEED: 6,
-    ATTACK_SPEED: 5,       // ticks per frame for attack anims
+    WALK_SPEED: 5,
+    ATTACK_SPEED: 4,       // ticks per frame for attack anims
     HIT_FLASH_FRAMES: 3,
-    KNOCKDOWN_FRAMES: 6,
-    KO_FRAMES: 8,
+    KNOCKDOWN_FRAMES: 5,
+    KO_FRAMES: 7,
 };
 
 // --- Visual Effects ---

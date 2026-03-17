@@ -257,11 +257,6 @@ export class InputManager {
         // Extract just the direction sequence from the buffer (strip timestamps for matching).
         const dirs = this._motionBuffer.map(e => e.dir);
 
-        // ── Check DP first (most specific: Forward -> Down -> Down-Forward + Punch) ──
-        if (punchJust && this._matchSequence(dirs, [forward, DIR.DOWN, downForward])) {
-            return MOVE.SHORYUKEN;
-        }
-
         // ── Punch + Kick together = HEAD_THROW ──
         if (punchJust && this._held.kick) {
             return MOVE.HEAD_THROW;
