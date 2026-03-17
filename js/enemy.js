@@ -16,25 +16,25 @@ import {
 // ---------------------------------------------------------
 const ROUND_DIFFICULTY = [
     {
-        // Round 0: Slow Performance — still dangerous, shorter pauses
-        decisionIntervalExtra: 8,
-        grabWeight: 0.20,
-        attackBias: 0.65,
-        walkSpeedMultiplier: 0.85,
+        // Round 0: Slow Performance — aggressive from the start
+        decisionIntervalExtra: 4,
+        grabWeight: 0.25,
+        attackBias: 0.70,
+        walkSpeedMultiplier: 0.90,
     },
     {
-        // Round 1: Vendor Lock-In — fast, more grabs, relentless
-        decisionIntervalExtra: 0,
+        // Round 1: Vendor Lock-In — fast, relentless grabs
+        decisionIntervalExtra: -2,
+        grabWeight: 0.40,
+        attackBias: 0.80,
+        walkSpeedMultiplier: 1.0,
+    },
+    {
+        // Round 2: Twig Debugging — brutal boss fight
+        decisionIntervalExtra: -10,
         grabWeight: 0.35,
-        attackBias: 0.75,
-        walkSpeedMultiplier: 0.95,
-    },
-    {
-        // Round 2: Twig Debugging — brutal, very fast, aggressive
-        decisionIntervalExtra: -8,
-        grabWeight: 0.30,
-        attackBias: 0.85,
-        walkSpeedMultiplier: 1.1,
+        attackBias: 0.90,
+        walkSpeedMultiplier: 1.15,
     },
 ];
 

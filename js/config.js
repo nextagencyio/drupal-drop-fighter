@@ -106,25 +106,25 @@ export const DAMAGE = {
     SPIN_KICK: 7,
 
     // Enemy moves (Round 1)
-    LAG_SPIKE: 6,
-    CACHE_MISS: 5,
-    BUFFERING_BLAST: 10,
-    TIMEOUT_SLAM: 13,
+    LAG_SPIKE: 8,
+    CACHE_MISS: 6,
+    BUFFERING_BLAST: 12,
+    TIMEOUT_SLAM: 15,
 
     // Enemy moves (Round 2)
-    CONTRACT_BIND: 7,
-    PROPRIETARY_HOOK: 6,
+    CONTRACT_BIND: 9,
+    PROPRIETARY_HOOK: 8,
     LICENSE_WALL: 0,  // barrier, no direct damage
-    MIGRATION_BLOCK: 12,
+    MIGRATION_BLOCK: 14,
 
     // Enemy moves (Round 3)
-    TEMPLATE_ERROR: 8,
-    STACK_TRACE_SLAM: 9,
-    SYNTAX_EXCEPTION: 12,
-    WSOD_ATTACK: 16,
+    TEMPLATE_ERROR: 10,
+    STACK_TRACE_SLAM: 12,
+    SYNTAX_EXCEPTION: 14,
+    WSOD_ATTACK: 18,
 
     // Block chip damage multiplier
-    CHIP_MULTIPLIER: 0.15,
+    CHIP_MULTIPLIER: 0.25,
 };
 
 // --- Hitbox Definitions ---
@@ -234,16 +234,16 @@ export const INPUT = {
 
 // --- AI ---
 export const AI = {
-    DECISION_INTERVAL: 15,     // frames between AI decisions
+    DECISION_INTERVAL: 12,     // frames between AI decisions
     REACT_DISTANCE_FAR: 300,
     REACT_DISTANCE_MID: 150,
     REACT_DISTANCE_CLOSE: 80,
-    BLOCK_CHANCE_BASE: 0.35,
+    BLOCK_CHANCE_BASE: 0.40,
     BLOCK_CHANCE_PER_ROUND: 0.12,
-    SPECIAL_CHANCE_BASE: 0.12,
-    SPECIAL_CHANCE_PER_ROUND: 0.08,
-    APPROACH_CHANCE: 0.65,
-    RETREAT_CHANCE: 0.10,
+    SPECIAL_CHANCE_BASE: 0.15,
+    SPECIAL_CHANCE_PER_ROUND: 0.10,
+    APPROACH_CHANCE: 0.70,
+    RETREAT_CHANCE: 0.08,
 };
 
 // --- Round Theme Data ---

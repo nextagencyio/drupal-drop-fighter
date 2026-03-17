@@ -90,47 +90,38 @@ export class InputManager {
         const container = document.getElementById('touch-controls');
         if (!container) return;
 
-        // D-pad buttons
-        const dirButtons = container.querySelectorAll('[data-dir]');
-        for (const btn of dirButtons) {
-            const dir = btn.getAttribute('data-dir'); // "up","down","left","right"
+        const allDirs = ['up', 'down', 'left', 'right'];
+        const allActions = ['punch', 'kick', 'special1', 'special2', 'special3'];
 
-            btn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                this._held[dir] = true;
-            }, { passive: false });
+        // On every touch event, scan ALL active touch points to determine
+        // which buttons are currently pressed. This handles finger slides,
+        // lifted fingers, and multi-touch correctly.
+        const syncTouches = (e) => {
+            e.preventDefault();
 
-            btn.addEventListener('touchend', (e) => {
-                e.preventDefault();
-                this._held[dir] = false;
-            }, { passive: false });
+            // Clear all touch-driven states
+            for (const d of allDirs) this._held[d] = false;
+            for (const a of allActions) this._held[a] = false;
 
-            btn.addEventListener('touchcancel', (e) => {
-                e.preventDefault();
-                this._held[dir] = false;
-            }, { passive: false });
-        }
+            // Check each active touch point
+            for (const touch of e.touches) {
+                const el = document.elementFromPoint(touch.clientX, touch.clientY);
+                if (!el) continue;
 
-        // Action buttons
-        const actionButtons = container.querySelectorAll('[data-action]');
-        for (const btn of actionButtons) {
-            const action = btn.getAttribute('data-action'); // "punch","kick"
+                // Check for d-pad direction (on the button or a child of it)
+                const dirEl = el.closest('[data-dir]');
+                if (dirEl) this._held[dirEl.getAttribute('data-dir')] = true;
 
-            btn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                this._held[action] = true;
-            }, { passive: false });
+                // Check for action button
+                const actEl = el.closest('[data-action]');
+                if (actEl) this._held[actEl.getAttribute('data-action')] = true;
+            }
+        };
 
-            btn.addEventListener('touchend', (e) => {
-                e.preventDefault();
-                this._held[action] = false;
-            }, { passive: false });
-
-            btn.addEventListener('touchcancel', (e) => {
-                e.preventDefault();
-                this._held[action] = false;
-            }, { passive: false });
-        }
+        container.addEventListener('touchstart', syncTouches, { passive: false });
+        container.addEventListener('touchmove', syncTouches, { passive: false });
+        container.addEventListener('touchend', syncTouches, { passive: false });
+        container.addEventListener('touchcancel', syncTouches, { passive: false });
     }
 
     // ────────────────────────────────────────────
